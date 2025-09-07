@@ -463,7 +463,7 @@
             try {
                 // Simulation de chargement - remplacez par votre fichier JSON réel
                 // Pour un vrai fichier JSON, utilisez:
-                const response = await fetch('https://raw.githubusercontent.com/limack0/medical-anagram/master/medical_terms.json');
+                const response = await fetch('https://raw.githubusercontent.com/limack0/medical-anagram/master/medical_terms.json?raw=true');
                 terms = await response.json();
                 totalTerms = terms.length;
                 startNewGame();
@@ -650,5 +650,6 @@
     </script>
 </body>
 </html>
+
 
 
