@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anagramme Médicale</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #2575fc;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        
+        .score {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #6a11cb;
+            font-weight: bold;
+        }
+        
+        .anagram {
+            font-size: 32px;
+            letter-spacing: 2px;
+            margin: 30px 0;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .input-container {
+            margin: 20px 0;
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 18px;
+            text-align: center;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            border-color: #2575fc;
+            outline: none;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        #check-btn {
+            background-color: #4cd964;
+            color: white;
+            flex: 2;
+            margin-right: 10px;
+        }
+        
+        #check-btn:hover {
+            background-color: #3cb054;
+        }
+        
+        #hint-btn {
+            background-color: #ffcc00;
+            color: white;
+            flex: 1;
+        }
+        
+        #hint-btn:hover {
+            background-color: #e6b800;
+        }
+        
+        #next-btn {
+            background-color: #2575fc;
+            color: white;
+            flex: 1;
+            margin-left: 10px;
+        }
+        
+        #next-btn:hover {
+            background-color: #1c64d4;
+        }
+        
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            display: none;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            display: block;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+        
+        .hint {
+            background-color: #fff3cd;
+            color: #856404;
+            display: block;
+        }
+        
+        .definition {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #2575fc;
+            text-align: left;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+            
+            .anagram {
+                font-size: 24px;
+            }
+            
+            button {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Anagramme Médicale</h1>
+        <div class="score">Score: <span id="score">0</span></div>
+        
+        <div class="anagram" id="anagram">Chargement...</div>
+        
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="Votre réponse...">
+        </div>
+        
+        <div class="buttons">
+            <button id="check-btn">Vérifier</button>
+            <button id="hint-btn">Indice</button>
+            <button id="next-btn">Suivant</button>
+        </div>
+        
+        <div class="message" id="message"></div>
+        
+        <div class="definition" id="definition"></div>
+    </div>
+
+    <script>
+        // Liste de termes médicaux avec leurs définitions
+        const medicalTerms = [
+            { word: "STETHOSCOPE", definition: "Instrument utilisé pour écouter les sons internes du corps, notamment le cœur et les poumons." },
+            { word: "ANTIBIOTIQUE", definition: "Substance utilisée pour détruire ou empêcher la croissance des bactéries." },
+            { word: "HYpertension", definition: "Pression artérielle anormalement élevée." },
+            { word: "DIABETE", definition: "Maladie caractérisée par une hyperglycémie chronique." },
+            { word: "ANALGESIQUE", definition: "Médicament qui soulage la douleur sans provoquer d'insensibilité totale." },
+            { word: "VACCINATION", definition: "Administration d'un vaccin pour stimuler le système immunitaire." },
+            { word: "ORTHOPEDIE", definition: "Spécialité médicale concernant le système musculo-squelettique." },
+            { word: "NEUROLOGIE", definition: "Spécialité médicale concernant les maladies du système nerveux." },
+            { word: "PEDIATRIE", definition: "Spécialité médicale concernant les enfants." },
+            { word: "OPHTALMOLOGIE", definition: "Spécialité médicale concernant les yeux et les maladies oculaires." },
+            { word: "DERMATOLOGIE", definition: "Spécialité médicale concernant la peau." },
+            { word: "GYNECOLOGIE", definition: "Spécialité médicale concernant l'appareil génital féminin." },
+            { word: "CARDIOLOGIE", definition: "Spécialité médicale concernant le cœur." },
+            { word: "RADIOLOGIE", definition: "Spécialité médicale utilisant l'imagerie pour diagnostiquer et traiter les maladies." },
+            { word: "ANESTHESIE", definition: "Processus d'insensibilisation à la douleur pendant une intervention chirurgicale." }
+        ];
+
+        let currentTerm = null;
+        let score = 0;
+        let hintsUsed = 0;
+
+        // Fonction pour mélanger les lettres d'un mot
+        function shuffleWord(word) {
+            const array = word.toUpperCase().split('');
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array.join('');
+        }
+
+        // Fonction pour choisir un terme médical aléatoire
+        function getRandomTerm() {
+            const randomIndex = Math.floor(Math.random() * medicalTerms.length);
+            return medicalTerms[randomIndex];
+        }
+
+        // Fonction pour afficher un nouvel anagramme
+        function displayNewAnagram() {
+            currentTerm = getRandomTerm();
+            const shuffled = shuffleWord(currentTerm.word);
+            document.getElementById('anagram').textContent = shuffled;
+            document.getElementById('user-input').value = '';
+            document.getElementById('message').className = 'message';
+            document.getElementById('message').style.display = 'none';
+            document.getElementById('definition').style.display = 'none';
+        }
+
+        // Fonction pour vérifier la réponse
+        function checkAnswer() {
+            const userInput = document.getElementById('user-input').value.trim().toUpperCase();
+            const messageElement = document.getElementById('message');
+            
+            if (userInput === currentTerm.word.toUpperCase()) {
+                messageElement.textContent = 'Correct! Bien joué.';
+                messageElement.className = 'message success';
+                messageElement.style.display = 'block';
+                
+                // Augmenter le score
+                score += 10 - hintsUsed;
+                document.getElementById('score').textContent = score;
+                
+                // Afficher la définition
+                document.getElementById('definition').textContent = currentTerm.definition;
+                document.getElementById('definition').style.display = 'block';
+            } else {
+                messageElement.textContent = 'Incorrect. Essayez encore!';
+                messageElement.className = 'message error';
+                messageElement.style.display = 'block';
+            }
+        }
+
+        // Fonction pour donner un indice
+        function giveHint() {
+            hintsUsed++;
+            const messageElement = document.getElementById('message');
+            messageElement.textContent = `Le terme commence par "${currentTerm.word[0]}" et contient ${currentTerm.word.length} lettres.`;
+            messageElement.className = 'message hint';
+            messageElement.style.display = 'block';
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            displayNewAnagram();
+            
+            // Événements
+            document.getElementById('check-btn').addEventListener('click', checkAnswer);
+            document.getElementById('hint-btn').addEventListener('click', giveHint);
+            document.getElementById('next-btn').addEventListener('click', () => {
+                hintsUsed = 0;
+                displayNewAnagram();
+            });
+            
+            document.getElementById('user-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    checkAnswer();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
