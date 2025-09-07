@@ -1,0 +1,12 @@
+[
+                    { term: "stéthoscope", definition: "Instrument médical utilisé pour écouter les sons internes du corps." },
+                    { term: "antibiotique", definition: "Substance qui tue ou inhibe la croissance des bactéries." },
+                    { term: "hypertension", definition: "Pression artérielle anormalement élevée." },
+                    { term: "gastroentérite", definition: "Inflammation de l'estomac et des intestins." },
+                    { term: "ophtalmologue", definition: "Médecin spécialiste des maladies des yeux." },
+                    { term: "cardiologie", definition: "Spécialité médicale concernant le cœur et les vaisseaux sanguins." },
+                    { term: "neurologie", definition: "Spécialité médicale concernant le système nerveux." },
+                    { term: "pédiatrie", definition: "Spécialité médicale concernant les enfants." },
+                    { term: "dermatologie", definition: "Spécialité médicale concernant la peau." },
+                    { term: "radiographie", definition: "Technique d'imagerie utilisant des rayons X." }
+                ];
