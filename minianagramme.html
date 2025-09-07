@@ -285,6 +285,55 @@
             messageElement.className = 'message hint';
             messageElement.style.display = 'block';
         }
+        // À ajouter dans le code JavaScript existant
+
+// Vérifier si nous sommes dans Telegram
+function isTelegramWebApp() {
+  return window.Telegram && window.Telegram.WebApp;
+}
+
+// Envoyer le score au bot
+function sendScoreToBot(score) {
+  if (isTelegramWebApp()) {
+    // Nous sommes dans Telegram Web App
+    Telegram.WebApp.sendData(JSON.stringify({
+      type: 'score',
+      score: score
+    }));
+    Telegram.WebApp.close();
+  } else {
+    // Nous sommes dans un navigateur normal
+    console.log('Score:', score);
+    alert(`Félicitations! Vous avez obtenu ${score} points!`);
+  }
+}
+
+// Modifier la fonction checkAnswer pour appeler sendScoreToBot
+function checkAnswer() {
+  const userInput = document.getElementById('user-input').value.trim().toUpperCase();
+  const messageElement = document.getElementById('message');
+  
+  if (userInput === currentTerm.word.toUpperCase()) {
+    messageElement.textContent = 'Correct! Bien joué.';
+    messageElement.className = 'message success';
+    messageElement.style.display = 'block';
+    
+    // Augmenter le score
+    score += 10 - hintsUsed;
+    document.getElementById('score').textContent = score;
+    
+    // Afficher la définition
+    document.getElementById('definition').textContent = currentTerm.definition;
+    document.getElementById('definition').style.display = 'block';
+    
+    // Envoyer le score au bot
+    sendScoreToBot(score);
+  } else {
+    messageElement.textContent = 'Incorrect. Essayez encore!';
+    messageElement.className = 'message error';
+    messageElement.style.display = 'block';
+  }
+}
 
         // Initialisation
         document.addEventListener('DOMContentLoaded', () => {
@@ -304,6 +353,8 @@
                 }
             });
         });
+        
     </script>
 </body>
+
 </html>
