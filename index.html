@@ -421,6 +421,62 @@
             gap: 10px;
         }
         
+        .save-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--secondary);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+        
+        .save-indicator.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .welcome-screen {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .welcome-title {
+            font-size: 24px;
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+        
+        .welcome-text {
+            margin-bottom: 25px;
+            color: #7f8c8d;
+        }
+        
+        .welcome-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .welcome-actions button {
+            border-radius: 12px;
+        }
+        
+        #resume-btn {
+            background: var(--accent);
+        }
+        
+        #resume-btn:hover {
+            background: #8e44ad;
+        }
+        
         @media (max-width: 600px) {
             .container {
                 padding: 15px;
@@ -443,6 +499,13 @@
                 flex-direction: column;
                 gap: 15px;
             }
+            
+            .save-indicator {
+                bottom: 10px;
+                right: 10px;
+                left: 10px;
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -453,7 +516,20 @@
             <p class="subtitle">20 questions pour tester vos connaissances médicales</p>
         </header>
         
-        <div class="progress-container">
+        <div class="welcome-screen" id="welcome-screen">
+            <div class="welcome-title">Anagrammes Médicales</div>
+            <div class="welcome-text">Saurez-vous retrouver les termes médicaux à partir des anagrammes? Une partie comprend 20 questions.</div>
+            <div class="welcome-actions">
+                <button id="start-new-btn" class="new-game-btn">
+                    <i class="fas fa-play"></i> Nouvelle partie
+                </button>
+                <button id="resume-btn">
+                    <i class="fas fa-history"></i> Reprendre la partie
+                </button>
+            </div>
+        </div>
+        
+        <div class="progress-container" id="progress-container" style="display: none;">
             <div class="progress-bar">
                 <div class="progress-fill" id="progress-fill"></div>
             </div>
@@ -463,7 +539,7 @@
             </div>
         </div>
         
-        <div class="game-stats">
+        <div class="game-stats" id="game-stats" style="display: none;">
             <div class="stat">
                 <span class="stat-value" id="score">0</span>
                 <span class="stat-label">Score</span>
@@ -478,7 +554,7 @@
             </div>
         </div>
         
-        <div class="game-area" id="game-area">
+        <div class="game-area" id="game-area" style="display: none;">
             <div class="anagram-container">
                 <div class="anagram-display" id="anagram"></div>
                 <button class="shuffle-btn" id="shuffle-btn">
@@ -510,13 +586,13 @@
                 <button id="skip-btn">
                     <i class="fas fa-forward"></i> Passer
                 </button>
-                <button id="new-game-btn">
-                    <i class="fas fa-redo"></i> Nouvelle partie
+                <button id="save-exit-btn" style="background: var(--accent);">
+                    <i class="fas fa-save"></i> Sauvegarder
                 </button>
             </div>
         </div>
         
-        <div class="game-summary" id="game-summary">
+        <div class="game-summary" id="game-summary" style="display: none;">
             <div class="summary-title">Partie terminée!</div>
             <div class="summary-stats">
                 <div class="summary-stat">
@@ -543,6 +619,10 @@
         </div>
     </div>
 
+    <div class="save-indicator" id="save-indicator">
+        <i class="fas fa-check-circle"></i> Partie sauvegardée
+    </div>
+
     <script>
         // Variables globales
         let terms = [];
@@ -554,8 +634,13 @@
         let hintsUsed = 0;
         let currentQuestion = 1;
         const totalQuestions = 20;
+        let gameId = null;
         
         // Éléments DOM
+        const welcomeScreenElement = document.getElementById('welcome-screen');
+        const progressContainerElement = document.getElementById('progress-container');
+        const gameStatsElement = document.getElementById('game-stats');
+        const gameAreaElement = document.getElementById('game-area');
         const anagramElement = document.getElementById('anagram');
         const userInputElement = document.getElementById('user-input');
         const validateBtnElement = document.getElementById('validate-btn');
@@ -571,31 +656,134 @@
         const currentQuestionElement = document.getElementById('current-question');
         const progressFillElement = document.getElementById('progress-fill');
         const progressPercentElement = document.getElementById('progress-percent');
-        const newGameBtnElement = document.getElementById('new-game-btn');
         const skipBtnElement = document.getElementById('skip-btn');
-        const gameAreaElement = document.getElementById('game-area');
+        const saveExitBtnElement = document.getElementById('save-exit-btn');
         const gameSummaryElement = document.getElementById('game-summary');
         const finalScoreElement = document.getElementById('final-score');
         const correctAnswersElement = document.getElementById('correct-answers');
         const successRateElement = document.getElementById('success-rate');
         const playAgainBtnElement = document.getElementById('play-again-btn');
         const shareBtnElement = document.getElementById('share-btn');
+        const saveIndicatorElement = document.getElementById('save-indicator');
+        const startNewBtnElement = document.getElementById('start-new-btn');
+        const resumeBtnElement = document.getElementById('resume-btn');
         
         // Charger les termes médicaux depuis le fichier JSON
         async function loadMedicalTerms() {
             try {
-                // Simulation de chargement - remplacez par votre fichier JSON réel
-                
                 
                 // Pour un vrai fichier JSON, utilisez:
                 const response = await fetch('https://raw.githubusercontent.com/limack0/medical-anagram/master/medical_terms.json?raw=true');
                 terms = await response.json();
                 
-                startNewGame();
+                
+                // Vérifier s'il y a une partie sauvegardée
+                checkSavedGame();
             } catch (error) {
                 console.error('Erreur lors du chargement des termes médicaux:', error);
                 showResult("Erreur de chargement des données. Veuillez réessayer.", "error");
             }
+        }
+        
+        // Vérifier s'il existe une partie sauvegardée
+        function checkSavedGame() {
+            const savedGame = localStorage.getItem('medicalAnagramSavedGame');
+            if (savedGame) {
+                try {
+                    const gameData = JSON.parse(savedGame);
+                    // Vérifier si la sauvegarde est récente (moins de 7 jours)
+                    const saveDate = new Date(gameData.saveDate);
+                    const now = new Date();
+                    const diffTime = Math.abs(now - saveDate);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    
+                    if (diffDays <= 7) {
+                        // Afficher le bouton pour reprendre
+                        resumeBtnElement.style.display = 'block';
+                    } else {
+                        // Supprimer la sauvegarde trop ancienne
+                        localStorage.removeItem('medicalAnagramSavedGame');
+                        resumeBtnElement.style.display = 'none';
+                    }
+                } catch (e) {
+                    console.error('Erreur lors de la lecture de la sauvegarde:', e);
+                    localStorage.removeItem('medicalAnagramSavedGame');
+                }
+            } else {
+                resumeBtnElement.style.display = 'none';
+            }
+        }
+        
+        // Charger une partie sauvegardée
+        function loadSavedGame() {
+            const savedGame = localStorage.getItem('medicalAnagramSavedGame');
+            if (savedGame) {
+                try {
+                    const gameData = JSON.parse(savedGame);
+                    
+                    // Restaurer l'état de la partie
+                    score = gameData.score || 0;
+                    streak = gameData.streak || 0;
+                    correctAnswers = gameData.correctAnswers || 0;
+                    currentQuestion = gameData.currentQuestion || 1;
+                    usedTerms = gameData.usedTerms || [];
+                    gameId = gameData.gameId;
+                    
+                    // Mettre à jour l'interface
+                    updateStats();
+                    updateProgress();
+                    
+                    // Cacher l'écran d'accueil et afficher le jeu
+                    welcomeScreenElement.style.display = 'none';
+                    progressContainerElement.style.display = 'block';
+                    gameStatsElement.style.display = 'flex';
+                    gameAreaElement.style.display = 'block';
+                    
+                    // Charger le terme suivant
+                    nextTerm();
+                    
+                    // Afficher un message de bienvenue
+                    showResult(`Partie rechargée! Vous étiez à la question ${currentQuestion}.`, "success");
+                    
+                    return true;
+                } catch (e) {
+                    console.error('Erreur lors du chargement de la sauvegarde:', e);
+                    showResult("Erreur lors du chargement de la sauvegarde.", "error");
+                    return false;
+                }
+            }
+            return false;
+        }
+        
+        // Sauvegarder la partie en cours
+        function saveGame() {
+            const gameData = {
+                score,
+                streak,
+                correctAnswers,
+                currentQuestion,
+                usedTerms,
+                gameId: gameId || Date.now().toString(),
+                saveDate: new Date().toISOString()
+            };
+            
+            try {
+                localStorage.setItem('medicalAnagramSavedGame', JSON.stringify(gameData));
+                showSaveIndicator();
+                return true;
+            } catch (e) {
+                console.error('Erreur lors de la sauvegarde:', e);
+                showResult("Erreur lors de la sauvegarde.", "error");
+                return false;
+            }
+        }
+        
+        // Afficher l'indicateur de sauvegarde
+        function showSaveIndicator() {
+            saveIndicatorElement.classList.add('show');
+            setTimeout(() => {
+                saveIndicatorElement.classList.remove('show');
+            }, 2000);
         }
         
         // Démarrer une nouvelle partie
@@ -611,15 +799,24 @@
             correctAnswers = 0;
             currentQuestion = 1;
             usedTerms = [];
+            gameId = Date.now().toString();
             
             // Mettre à jour l'interface
             updateStats();
             updateProgress();
-            gameAreaElement.style.display = "block";
+            
+            // Cacher l'écran d'accueil et afficher le jeu
+            welcomeScreenElement.style.display = 'none';
+            progressContainerElement.style.display = 'block';
+            gameStatsElement.style.display = 'flex';
+            gameAreaElement.style.display = 'block';
             gameSummaryElement.style.display = "none";
             
             // Commencer avec la première question
             nextTerm();
+            
+            // Sauvegarder la nouvelle partie
+            saveGame();
         }
         
         // Sélectionner un terme aléatoire non utilisé
@@ -658,6 +855,9 @@
             
             // Mettre à jour la progression
             updateProgress();
+            
+            // Sauvegarder la progression
+            saveGame();
             
             // Retirer l'animation après un délai
             setTimeout(() => {
@@ -708,6 +908,9 @@
                 userInputElement.style.borderColor = "#2ecc71";
                 createConfetti(20);
                 
+                // Sauvegarder la progression
+                saveGame();
+                
                 // Passer à la question suivante après un délai
                 setTimeout(() => {
                     currentQuestion++;
@@ -742,10 +945,27 @@
             updateStats();
             showResult(`Terme passé: "${currentTerm.term}".`, "error");
             
+            // Sauvegarder la progression
+            saveGame();
+            
             setTimeout(() => {
                 currentQuestion++;
                 nextTerm();
             }, 2000);
+        }
+        
+        // Sauvegarder et quitter
+        function saveAndExit() {
+            if (saveGame()) {
+                // Revenir à l'écran d'accueil
+                welcomeScreenElement.style.display = 'block';
+                progressContainerElement.style.display = 'none';
+                gameStatsElement.style.display = 'none';
+                gameAreaElement.style.display = 'none';
+                
+                // Vérifier s'il y a une partie sauvegardée pour afficher le bouton de reprise
+                checkSavedGame();
+            }
         }
         
         // Afficher un résultat
@@ -782,6 +1002,9 @@
             successRateElement.textContent = `${successRate}%`;
             
             createConfetti(50);
+            
+            // Supprimer la sauvegarde
+            localStorage.removeItem('medicalAnagramSavedGame');
         }
         
         // Créer un effet de confetti
@@ -828,10 +1051,23 @@
         });
         hintBtnElement.addEventListener('click', giveHint);
         shuffleBtnElement.addEventListener('click', shuffleAnagram);
-        newGameBtnElement.addEventListener('click', startNewGame);
         skipBtnElement.addEventListener('click', skipTerm);
+        saveExitBtnElement.addEventListener('click', saveAndExit);
         playAgainBtnElement.addEventListener('click', startNewGame);
         shareBtnElement.addEventListener('click', shareScore);
+        startNewBtnElement.addEventListener('click', startNewGame);
+        resumeBtnElement.addEventListener('click', function() {
+            if (!loadSavedGame()) {
+                showResult("Aucune partie sauvegardée trouvée.", "error");
+            }
+        });
+        
+        // Sauvegarder automatiquement lorsque la page est sur le point d'être quittée
+        window.addEventListener('beforeunload', function() {
+            if (gameAreaElement.style.display !== 'none') {
+                saveGame();
+            }
+        });
         
         // Initialiser le jeu
         loadMedicalTerms();
