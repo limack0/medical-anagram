@@ -1,12 +1,158 @@
 [
-                    { term: "stéthoscope", definition: "Instrument médical utilisé pour écouter les sons internes du corps." },
-                    { term: "antibiotique", definition: "Substance qui tue ou inhibe la croissance des bactéries." },
-                    { term: "hypertension", definition: "Pression artérielle anormalement élevée." },
-                    { term: "gastroentérite", definition: "Inflammation de l'estomac et des intestins." },
-                    { term: "ophtalmologue", definition: "Médecin spécialiste des maladies des yeux." },
-                    { term: "cardiologie", definition: "Spécialité médicale concernant le cœur et les vaisseaux sanguins." },
-                    { term: "neurologie", definition: "Spécialité médicale concernant le système nerveux." },
-                    { term: "pédiatrie", definition: "Spécialité médicale concernant les enfants." },
-                    { term: "dermatologie", definition: "Spécialité médicale concernant la peau." },
-                    { term: "radiographie", definition: "Technique d'imagerie utilisant des rayons X." }
-                ];
+    {
+        "term": "stéthoscope",
+        "definition": "Instrument médical utilisé pour écouter les sons internes du corps."
+    },
+    {
+        "term": "antibiotique",
+        "definition": "Substance qui tue ou inhibe la croissance des bactéries."
+    },
+    {
+        "term": "hypertension",
+        "definition": "Pression artérielle anormalement élevée."
+    },
+    {
+        "term": "gastroentérite",
+        "definition": "Inflammation de l'estomac et des intestins."
+    },
+    {
+        "term": "ophtalmologue",
+        "definition": "Médecin spécialiste des maladies des yeux."
+    },
+    {
+        "term": "cardiologie",
+        "definition": "Spécialité médicale concernant le cœur et les vaisseaux sanguins."
+    },
+    {
+        "term": "neurologie",
+        "definition": "Spécialité médicale concernant le système nerveux."
+    },
+    {
+        "term": "pédiatrie",
+        "definition": "Spécialité médicale concernant les enfants."
+    },
+    {
+        "term": "dermatologie",
+        "definition": "Spécialité médicale concernant la peau."
+    },
+    {
+        "term": "radiographie",
+        "definition": "Technique d'imagerie utilisant des rayons X."
+    },
+    {
+        "term": "IRM",
+        "definition": "Imagerie par résonance magnétique, technique d'exploration médicale non invasive."
+    },
+    {
+        "term": "scanner",
+        "definition": "Examen d’imagerie utilisant les rayons X et l’informatique."
+    },
+    {
+        "term": "anesthésie",
+        "definition": "Méthode permettant de supprimer la douleur lors d’une intervention médicale."
+    },
+    {
+        "term": "diabète",
+        "definition": "Maladie chronique caractérisée par un excès de sucre dans le sang."
+    },
+    {
+        "term": "hémoglobine",
+        "definition": "Protéine des globules rouges qui transporte l’oxygène."
+    },
+    {
+        "term": "tachycardie",
+        "definition": "Accélération anormale du rythme cardiaque."
+    },
+    {
+        "term": "bradycardie",
+        "definition": "Ralentissement anormal du rythme cardiaque."
+    },
+    {
+        "term": "asthme",
+        "definition": "Maladie respiratoire chronique caractérisée par une gêne respiratoire."
+    },
+    {
+        "term": "allergie",
+        "definition": "Réaction immunitaire excessive à une substance étrangère."
+    },
+    {
+        "term": "fracture",
+        "definition": "Rupture d’un os."
+    },
+    {
+        "term": "hémorragie",
+        "definition": "Perte de sang due à une lésion vasculaire."
+    },
+    {
+        "term": "thrombose",
+        "definition": "Formation d’un caillot sanguin dans un vaisseau."
+    },
+    {
+        "term": "infarctus",
+        "definition": "Destruction d’un tissu causée par l’interruption de l’apport sanguin."
+    },
+    {
+        "term": "cancer",
+        "definition": "Maladie caractérisée par la prolifération anarchique de cellules."
+    },
+    {
+        "term": "oncologie",
+        "definition": "Spécialité médicale consacrée à l’étude et au traitement du cancer."
+    },
+    {
+        "term": "psychiatrie",
+        "definition": "Spécialité médicale concernant les maladies mentales."
+    },
+    {
+        "term": "orthopédie",
+        "definition": "Spécialité médicale concernant les maladies et déformations des os et des muscles."
+    },
+    {
+        "term": "gynécologie",
+        "definition": "Spécialité médicale concernant les organes reproducteurs féminins."
+    },
+    {
+        "term": "obstétrique",
+        "definition": "Spécialité médicale concernant la grossesse et l’accouchement."
+    },
+    {
+        "term": "virologie",
+        "definition": "Étude des virus et des maladies virales."
+    },
+    {
+        "term": "bactériologie",
+        "definition": "Étude des bactéries et des maladies qu’elles provoquent."
+    },
+    {
+        "term": "immunologie",
+        "definition": "Étude du système immunitaire."
+    },
+    {
+        "term": "pathologie",
+        "definition": "Étude des maladies et de leurs causes."
+    },
+    {
+        "term": "pharmacologie",
+        "definition": "Science des médicaments et de leurs effets."
+    },
+    {
+        "term": "sérologie",
+        "definition": "Étude des sérums et des réactions immunitaires."
+    },
+    {
+        "term": "biopsie",
+        "definition": "Prélèvement d’un tissu pour analyse."
+    },
+    {
+        "term": "endoscopie",
+        "definition": "Exploration visuelle de l’intérieur du corps avec un endoscope."
+    },
+    {
+        "term": "échographie",
+        "definition": "Technique d’imagerie utilisant les ultrasons."
+    },
+    {
+        "term": "sutures",
+        "definition": "Fils utilisés pour refermer une plaie chirurgicale."
+    }
+]
